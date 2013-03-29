@@ -1,0 +1,15 @@
+{application, syslog_drain_ws,
+ [
+  {id, "syslog-drain-ws"},
+  {description, "Websocket syslog drain"},
+  {vsn, "0.1.0"},
+  {registered, [syslog_drain_ws_sup]},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  ranch,
+                  cowboy
+                 ]},
+  {mod, { syslog_drain_ws_app, []}},
+  {env, []}
+ ]}.
