@@ -1,4 +1,4 @@
--module(syslog_drain_ws_app).
+-module(syslog_pipeline_ws_app).
 
 -behaviour(application).
 
@@ -9,7 +9,7 @@
 %% API.
 
 start(_StartType, _StartArgs) ->
-  syslog_drain_ws_sup:start_link().
+  syslog_pipeline_ws_sup:start_link().
 
 stop(_State) ->
   ok.

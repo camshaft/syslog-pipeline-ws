@@ -1,5 +1,5 @@
 %% @private
--module(syslog_drain_ws_sup).
+-module(syslog_pipeline_ws_sup).
 -behaviour(supervisor).
 
 %% API
