@@ -24,7 +24,7 @@ websocket_init(_TransportName, Req, Pipeline) ->
   {ok, Req, Pipeline}.
 
 websocket_handle({text, Msg}, Req, Pipeline) ->
-  syslog_pipeline:handle(Msg, Pipeline),
+  syslog_pipeline:handle(Pipeline, Msg),
   {ok, Req, Pipeline};
 websocket_handle(_Data, Req, Pipeline) ->
   {ok, Req, Pipeline}.
