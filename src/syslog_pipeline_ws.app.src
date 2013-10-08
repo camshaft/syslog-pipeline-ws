@@ -4,6 +4,6 @@
   {vsn, "0.1.0"},
   {registered, [syslog_pipeline_ws_sup]},
   {applications, [kernel, stdlib, ranch, cowboy, syslog_pipeline]},
-  {mod, { syslog_drain_ws_app, []}},
+  {mod, { syslog_pipeline_ws_app, []}},
   {env, []}
 ]}.
