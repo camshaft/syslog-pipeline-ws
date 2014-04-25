@@ -14,7 +14,8 @@ start_server(Ref, NbAcceptors, TransOpts, ProtoOpts, Pipeline)
     when is_integer(NbAcceptors), NbAcceptors > 0 ->
   Dispatch = cowboy_router:compile([
     {'_', [
-      {'_', syslog_pipeline_ws_handler, Pipeline}
+      {"/", syslog_pipeline_ws_handler, Pipeline},
+      {"/:host", syslog_pipeline_ws_handler, Pipeline}
     ]}
   ]),
   cowboy:start_http(Ref, NbAcceptors, TransOpts,

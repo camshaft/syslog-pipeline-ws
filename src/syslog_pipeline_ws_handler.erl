@@ -21,10 +21,11 @@ init(_TransportName, Req, Pipeline) ->
 
 %% Websocket
 websocket_init(_TransportName, Req, Pipeline) ->
-  {ok, Req, Pipeline}.
+  {Host, Req2} = cowboy_req:binding(host, Req),
+  {ok, Req2, {Pipeline, Host}}.
 
-websocket_handle({text, Msg}, Req, Pipeline) ->
-  syslog_pipeline:handle(Pipeline, Msg),
+websocket_handle({text, Msg}, Req, {Pipeline, Host}) ->
+  pipeline(Pipeline, Host, Msg),
   {ok, Req, Pipeline};
 websocket_handle(_Data, Req, Pipeline) ->
   {ok, Req, Pipeline}.
@@ -38,21 +39,28 @@ websocket_terminate(_Reason, _Req, _Pipeline) ->
 %% HTTP
 handle(Req, Pipeline) ->
   {Method, Req2} = cowboy_req:method(Req),
-  {ok, Log, Req3} = maybe_handle(Method, cowboy_req:has_body(Req2), Req2),
-  syslog_pipeline:handle(Pipeline, Log),
+  {ok, Log, Host, Req3} = maybe_handle(Method, cowboy_req:has_body(Req2), Req2),
+  pipeline(Pipeline, Host, Log),
   cowboy_req:reply(200, Req2),
   {ok, Req3, Pipeline}.
 
 maybe_handle(<<"GET">>, _, Req) ->
   {Log, Req2} = cowboy_req:qs_val(<<"msg">>, Req, <<>>),
-  {ok, Log, Req2};
+  {Host, Req3} = cowboy_req:binding(host, Req2),
+  {ok, Log, Host, Req3};
 maybe_handle(<<"POST">>, true, Req) ->
   {ok, Log, Req2} = cowboy_req:body(Req),
-  {ok, Log, Req2};
+  {Host, Req3} = cowboy_req:binding(host, Req2),
+  {ok, Log, Host, Req3};
 maybe_handle(<<"POST">>, false, Req) ->
   {{error, missing_body}, Req};
 maybe_handle(_, _, Req) ->
   {{error, method_not_allowed}, Req}.
+
+pipeline(Pipeline, undefined, Log) ->
+  syslog_pipeline:handle(Pipeline, Log);
+pipeline(Pipeline, Host, Log) ->
+  syslog_pipeline:handle(Pipeline, Log, [{hostname, Host}]).
 
 terminate(_Reason, _Req, _Pipeline) ->
   ok.
